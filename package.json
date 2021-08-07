@@ -1,26 +1,28 @@
 {
   "name": "electron-react-app",
-  "version": "0.1.0",
+  "description": "My first electron app built with React",
+  "version": "0.1.0-beta.1",
+  "author": "DerLev",
   "private": true,
-  "main": "src/electron-starter.js",
+  "main": "public/electron.js",
   "homepage": "./",
   "dependencies": {
-    "electron": "^13.1.8",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react-dom": "^17.0.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
     "electron-dev:win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
     "dev": "nf start",
-    "react": "BROWSER=none react-scripts start",
-    "react:win": "set BROWSER=none && react-scripts start"
+    "react": "BROWSER=none craco start",
+    "react:win": "set BROWSER=none && craco start",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
   },
   "eslintConfig": {
     "extends": [
@@ -41,6 +43,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^6.2.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -48,7 +51,21 @@
     "@types/node": "^12.20.19",
     "@types/react": "^17.0.16",
     "@types/react-dom": "^17.0.9",
+    "autoprefixer": "^9.8.6",
+    "electron": "^13.1.8",
+    "electron-builder": "^22.11.7",
     "foreman": "^3.0.1",
+    "postcss": "^7.0.36",
+    "react-scripts": "^4.0.3",
+    "sass": "^1.37.5",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
     "typescript": "^4.3.5"
+  },
+  "build": {
+    "appId": "de.mc-mineserver.electron-react-app",
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.ico"
+    }
   }
 }

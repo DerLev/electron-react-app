@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -8,8 +8,15 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
+    minWidth: 940,
+    minHeight: 500,
+    fullscreenable: false,
     icon: path.join(__dirname, '/../build/favicon.ico'),
-    autoHideMenuBar: true
+    frame: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
   });
 
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -26,6 +33,8 @@ function createWindow() {
   mainWindow.on('closed', function () {
       mainWindow = null
   });
+
+  listeners();
 }
 
 app.on('ready', createWindow);
@@ -41,3 +50,33 @@ app.on('activate', function () {
     createWindow();
   }
 });
+
+var maximized = false;
+
+const listeners = () => {
+  mainWindow.on('maximize', () => {
+    maximized = true;
+  });
+  
+  mainWindow.on('unmaximize', () => {
+    maximized = false;
+  });
+}
+
+ipcMain.on('window', (e, arg) => {
+  if(arg == 'close') {
+    mainWindow.close();
+  }
+
+  if(arg == 'maximize') {
+    if (maximized == true) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+
+  if(arg == 'minimize') {
+    mainWindow.minimize();
+  }
+})

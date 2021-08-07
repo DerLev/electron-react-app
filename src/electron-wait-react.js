@@ -21,6 +21,11 @@ const tryConnection = () => client.connect({port: port}, () => {
       electron.stdout.on("data", function(data) {
         console.log(data.toString());
       });
+      electron.on('close', function(code) {
+        console.log('electron exited with code: ' + code);
+        startedElectron = false;
+        tryConnection();
+      })
     }
   }
 );
