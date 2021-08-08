@@ -22,7 +22,7 @@ function App() {
         <span className="text-gray-500">
           electron-react-app
         </span>
-        <div className="flex gap-1">
+        <div className="flex">
           <span className="text-gray-500 hover:text-gray-400 bg-transparent hover:bg-gray-800 cursor-pointer transition duration-500 py-1 px-2" onClick={minimize}>
             <MinimizeSvg />
           </span>
