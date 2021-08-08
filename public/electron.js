@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 const url = require('url');
 const pjson = require('../package.json');
+const AutoLaunch = require('auto-launch');
 
 let mainWindow;
 let tray;
@@ -13,7 +14,7 @@ function createWindow() {
     minWidth: 940,
     minHeight: 500,
     fullscreenable: false,
-    icon: path.join(__dirname, '/../build/favicon.ico'),
+    icon: path.join(__dirname, '/../build/icon-256x256.png'),
     frame: false,
     webPreferences: {
       nodeIntegration: true,
@@ -72,6 +73,16 @@ app.on('ready', () => {
   ];
   const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
   tray.setContextMenu(trayMenu);
+
+  if(!process.env.ELECTRON_START_URL) {
+    let autoLaunch = new AutoLaunch({
+      name: pjson.name,
+      path: app.getPath('exe'),
+    });
+    autoLaunch.isEnabled().then((isEnabled) => {
+      if (!isEnabled) autoLaunch.enable();
+    });
+  }
 });
 
 app.on('window-all-closed', function () {
