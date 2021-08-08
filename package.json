@@ -4,6 +4,10 @@
   "version": "0.1.0-beta.4",
   "author": "DerLev",
   "license" : "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/DerLev/electron-react-app.git"
+  },
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
