@@ -3,6 +3,7 @@ const path = require('path');
 const url = require('url');
 const pjson = require('../package.json');
 const AutoLaunch = require('auto-launch');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 let tray;
@@ -38,6 +39,10 @@ function createWindow() {
   });
 
   listeners();
+
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
 
 app.on('ready', () => {
@@ -131,4 +136,20 @@ ipcMain.on('app', (e, arg) => {
   if(arg == 'title') {
     e.returnValue = pjson.name;
   }
+
+  if(arg == 'version') {
+    e.returnValue = app.getVersion();
+  }
+
+  if(arg == 'update') {
+    autoUpdater.quitAndInstall();
+  }
 })
+
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update', 'available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update', 'downloaded');
+});
