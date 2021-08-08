@@ -17,11 +17,11 @@ The App will open with the DevTools panel open.
 
 Builds the app for production to the `build` folder.
 
-For your ready electron app you need to run the next command.
+For your ready electron app you will need to run the next command.
 
 ### `npm run dist`
 
 Your App will be built to an installable `.exe` file in the `dist` folder.\
-You will find your file (e.g. `electron-react-app Setup 0.1.0-beta.4.exe`) and a few other files.
+You will find your file (e.g. `electron-react-app Setup 0.1.0-beta.4.exe`) and a few other files in it.
 
 **Note: You will need to change the `version` in `package.json` for publishing**
