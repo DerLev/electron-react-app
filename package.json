@@ -3,6 +3,7 @@
   "description": "My first electron app built with React",
   "version": "0.1.0-beta.4",
   "author": "DerLev",
+  "license" : "SEE LICENSE IN LICENSE",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
