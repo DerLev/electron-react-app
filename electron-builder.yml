@@ -1,0 +1,7 @@
+appId: com.example.ElectronAutoUpdate
+publish:
+  provider: github
+  token: [YOUR GITHUB ACCESS TOKEN]
+win:
+  target: nsis
+  icon: build/icon.ico

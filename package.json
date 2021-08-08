@@ -4,6 +4,10 @@
   "version": "0.1.0-beta.4",
   "author": "DerLev",
   "license" : "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/DerLev/electron-react-app.git"
+  },
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -65,13 +69,5 @@
     "sass": "^1.37.5",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
     "typescript": "^4.3.5"
-  },
-  "build": {
-    "appId": "de.mc-mineserver.electron-react-app",
-    "productName": "electron-react-app",
-    "win": {
-      "target": "nsis",
-      "icon": "build/icon.ico"
-    }
   }
 }
