@@ -1,8 +1,10 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 const url = require('url');
+const pjson = require('../package.json');
 
 let mainWindow;
+let tray;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -37,7 +39,40 @@ function createWindow() {
   listeners();
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+
+  tray = new Tray(path.join(__dirname, '/../build/icon.png'));
+  tray.setToolTip(pjson.name);
+  tray.on('click', () => {
+    mainWindow.show();
+  });
+
+  const trayMenuTemplate = [
+    {
+      label: pjson.name,
+      sublabel: 'v' + pjson.version,
+      enabled: false,
+      icon: path.join(__dirname, '/../build/trayMenu.png')
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Open App',
+      click: () => mainWindow.show()
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Quit App',
+      click: () => app.quit()
+    }
+  ];
+  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+  tray.setContextMenu(trayMenu);
+});
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
@@ -65,7 +100,7 @@ const listeners = () => {
 
 ipcMain.on('window', (e, arg) => {
   if(arg == 'close') {
-    mainWindow.close();
+    mainWindow.hide();
   }
 
   if(arg == 'maximize') {
@@ -78,5 +113,11 @@ ipcMain.on('window', (e, arg) => {
 
   if(arg == 'minimize') {
     mainWindow.minimize();
+  }
+})
+
+ipcMain.on('app', (e, arg) => {
+  if(arg == 'title') {
+    e.returnValue = pjson.name;
   }
 })
