@@ -2,6 +2,8 @@ import { ReactComponent as MinimizeSvg } from './minimize.svg';
 import { ReactComponent as MaximizeSvg } from './maximize.svg';
 import { ReactComponent as CloseSvg } from './close.svg';
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 const ipc = window.require('electron').ipcRenderer
 
 function App() {
@@ -45,6 +47,11 @@ function App() {
       <div className="bg-gray-900 border-b border-gray-800 flex justify-between appBar items-center pl-1">
         <span className="text-gray-500">{ title }<span className="ml-1 font-light">v{ version }</span></span>
         <div className="flex">
+          {
+            update == 'downloaded' && <span className="updateAvailable cursor-pointer px-2" onClick={restart}>
+              <FontAwesomeIcon icon={faSyncAlt} />
+            </span>
+          }
           <span className="text-gray-500 hover:text-gray-400 bg-transparent hover:bg-gray-800 cursor-pointer transition duration-500 py-1 px-2" onClick={minimize}>
             <MinimizeSvg />
           </span>
@@ -56,8 +63,6 @@ function App() {
           </span>
         </div>
       </div>
-      <div>{ update }</div>
-      <div><button onClick={restart}>Restart</button></div>
     </>
   );
 }
