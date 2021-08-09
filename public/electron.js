@@ -6,6 +6,8 @@ const AutoLaunch = require('auto-launch');
 const { autoUpdater } = require('electron-updater');
 const Store = require('./store.js');
 
+const gotTheLock = app.requestSingleInstanceLock();
+
 const store = new Store({
   configName: 'user-preferences',
   defaults: {
@@ -64,51 +66,64 @@ function createWindow() {
 }
 
 app.on('ready', () => {
-  createWindow();
+  
+  if(!gotTheLock) {
+    app.quit();
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (!mainWindow.isVisible()) mainWindow.show()
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus()
+      }
+    })
+      
+    createWindow();
 
-  tray = new Tray(path.join(__dirname, '/../build/icon.png'));
-  tray.setToolTip(pjson.productName);
-  tray.on('click', () => {
-    mainWindow.show();
-    autoUpdater.checkForUpdates();
-  });
+    tray = new Tray(path.join(__dirname, '/../build/icon.png'));
+    tray.setToolTip(pjson.productName);
+    tray.on('click', () => {
+      mainWindow.show();
+      autoUpdater.checkForUpdates();
+    });
 
-  const trayMenuTemplate = [
-    {
-      label: pjson.productName,
-      sublabel: 'v' + pjson.version,
-      enabled: false,
-      icon: path.join(__dirname, '/../build/trayMenu.png')
-    },
-    {
-      type: 'separator'
-    },
-    {
-      label: 'Open App',
-      click: () => {mainWindow.show(); autoUpdater.checkForUpdates();}
-    },
-    {
-      type: 'separator'
-    },
-    {
-      label: 'Quit App',
-      click: () => app.quit()
+    const trayMenuTemplate = [
+      {
+        label: pjson.productName,
+        sublabel: 'v' + pjson.version,
+        enabled: false,
+        icon: path.join(__dirname, '/../build/trayMenu.png')
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Open App',
+        click: () => {mainWindow.show(); autoUpdater.checkForUpdates();}
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit App',
+        click: () => app.quit()
+      }
+    ];
+    const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray.setContextMenu(trayMenu);
+
+    let autoStart = store.get('autoStart');
+
+    if(!process.env.ELECTRON_START_URL) {
+      autoLaunch = new AutoLaunch({
+        name: pjson.productName,
+        path: app.getPath('exe'),
+      });
+      autoLaunch.isEnabled().then((isEnabled) => {
+        if (!isEnabled && autoStart) autoLaunch.enable();
+        if (!autoStart) autoLaunch.disable();
+      });
     }
-  ];
-  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-  tray.setContextMenu(trayMenu);
-
-  let autoStart = store.get('autoStart');
-
-  if(!process.env.ELECTRON_START_URL) {
-    autoLaunch = new AutoLaunch({
-      name: pjson.productName,
-      path: app.getPath('exe'),
-    });
-    autoLaunch.isEnabled().then((isEnabled) => {
-      if (!isEnabled && autoStart) autoLaunch.enable();
-      if (!autoStart) autoLaunch.disable();
-    });
   }
 });
 
