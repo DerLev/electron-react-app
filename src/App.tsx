@@ -23,6 +23,14 @@ function App() {
     await ipc.send('app', 'update')
   }
 
+  const asEnable = async () => {
+    await ipc.send('app', 'autostart-enable')
+  }
+
+  const asDisable = async () => {
+    await ipc.send('app', 'autostart-disable')
+  }
+
   const [title, setTitle] = useState();
   const [version, setVersion] = useState();
   const [update, setUpdate] = useState('none');
@@ -63,6 +71,8 @@ function App() {
           </span>
         </div>
       </div>
+      <div><button onClick={asEnable}>Enable autostart</button></div>
+      <div><button onClick={asDisable}>Disable autostart</button></div>
     </>
   );
 }

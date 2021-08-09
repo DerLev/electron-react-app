@@ -4,14 +4,27 @@ const url = require('url');
 const pjson = require('../package.json');
 const AutoLaunch = require('auto-launch');
 const { autoUpdater } = require('electron-updater');
+const Store = require('./store.js');
+
+const store = new Store({
+  configName: 'user-preferences',
+  defaults: {
+    windowBounds: { width: 1280, height: 720 },
+    windowMaximized: false,
+    autoStart: true
+  }
+});
 
 let mainWindow;
 let tray;
+let autoLaunch;
 
 function createWindow() {
+  let { width, height } = store.get('windowBounds');
+
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width,
+    height,
     minWidth: 940,
     minHeight: 500,
     fullscreenable: false,
@@ -35,7 +48,7 @@ function createWindow() {
   }
 
   mainWindow.on('closed', function () {
-      mainWindow = null
+    mainWindow = null
   });
 
   listeners();
@@ -43,6 +56,11 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdates();
   });
+
+  let windowMaximized = store.get('windowMaximized');
+  if(windowMaximized == true) {
+    mainWindow.maximize();
+  }
 }
 
 app.on('ready', () => {
@@ -80,13 +98,16 @@ app.on('ready', () => {
   const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
   tray.setContextMenu(trayMenu);
 
+  let autoStart = store.get('autoStart');
+
   if(!process.env.ELECTRON_START_URL) {
-    let autoLaunch = new AutoLaunch({
+    autoLaunch = new AutoLaunch({
       name: pjson.productName,
       path: app.getPath('exe'),
     });
     autoLaunch.isEnabled().then((isEnabled) => {
-      if (!isEnabled) autoLaunch.enable();
+      if (!isEnabled && autoStart) autoLaunch.enable();
+      if (!autoStart) autoLaunch.disable();
     });
   }
 });
@@ -103,15 +124,23 @@ app.on('activate', function () {
   }
 });
 
-var maximized = false;
-
 const listeners = () => {
   mainWindow.on('maximize', () => {
-    maximized = true;
+    store.set('windowMaximized', true);
   });
   
   mainWindow.on('unmaximize', () => {
-    maximized = false;
+    store.set('windowMaximized', false);
+  });
+  
+  mainWindow.on('resize', () => {
+    let { width, height } = mainWindow.getBounds();
+    let windowMaximized = store.get('windowMaximized');
+    setTimeout(() => {
+      if(windowMaximized == false) {
+        store.set('windowBounds', { width, height });
+      }
+    }, 10);
   });
 }
 
@@ -121,7 +150,9 @@ ipcMain.on('window', (e, arg) => {
   }
 
   if(arg == 'maximize') {
-    if (maximized == true) {
+    let windowMaximized = store.get('windowMaximized');
+
+    if (windowMaximized == true) {
       mainWindow.unmaximize();
     } else {
       mainWindow.maximize();
@@ -144,6 +175,16 @@ ipcMain.on('app', (e, arg) => {
 
   if(arg == 'update') {
     autoUpdater.quitAndInstall();
+  }
+
+  if(arg == 'autostart-disable') {
+    autoLaunch.disable();
+    store.set('autoStart', false);
+  }
+
+  if(arg == 'autostart-enable') {
+    autoLaunch.enable();
+    store.set('autoStart', true);
   }
 })
 
