@@ -17,18 +17,3 @@ a {
     }
   }
 }
-
-.updateAvailable {
-  @apply bg-transparent text-gray-500;
-  animation: pulsing 2.5s ease infinite alternate;
-}
-
-@keyframes pulsing {
-  from {
-    @apply bg-transparent text-gray-500;
-  }
-
-  to {
-    @apply bg-green-500 text-white;
-  }
-}

@@ -3,7 +3,7 @@ import { ReactComponent as MaximizeSvg } from './maximize.svg';
 import { ReactComponent as CloseSvg } from './close.svg';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
 const ipc = window.require('electron').ipcRenderer
 
 function App() {
@@ -60,8 +60,14 @@ function App() {
         <span className="text-gray-500" onClick={ctxMenu}>{ title }</span>
         <div className="flex">
           {
-            update === 'downloaded' && <span className="updateAvailable cursor-pointer px-2" onClick={restart}>
+            update === 'downloaded' && <span className="text-gray-500 hover:text-white hover:bg-green-500 transition duration-500 cursor-pointer px-2 flex items-center justify-center" onClick={restart}>
               <FontAwesomeIcon icon={faSyncAlt} />
+              <FontAwesomeIcon icon={faSyncAlt} className="animate-ping absolute opacity-40" />
+            </span>
+          }
+          {
+            update === 'available' && <span className="text-gray-500 px-2" onClick={restart}>
+              <FontAwesomeIcon icon={faDownload} className="animate-pulse" />
             </span>
           }
           <span className="text-gray-500 hover:text-gray-400 bg-transparent hover:bg-gray-800 cursor-pointer transition duration-500 py-1 px-2" onClick={minimize}>
