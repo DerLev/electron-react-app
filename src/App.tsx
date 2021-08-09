@@ -31,6 +31,10 @@ function App() {
     await ipc.send('app', 'autostart-disable')
   }
 
+  const ctxMenu = async () => {
+    await ipc.send('menu', 'appBar')
+  }
+
   const [title, setTitle] = useState();
   const [version, setVersion] = useState();
   const [update, setUpdate] = useState('none');
@@ -41,22 +45,22 @@ function App() {
   }, []);
 
   ipc.on('update', (e:any, arg:any) => {
-    if(arg == 'available') {
+    if(arg === 'available') {
       setUpdate('available');
     }
 
-    if(arg == 'downloaded') {
+    if(arg === 'downloaded') {
       setUpdate('downloaded');
     }
   });
 
   return (
     <>
-      <div className="bg-gray-900 border-b border-gray-800 flex justify-between appBar items-center pl-1">
-        <span className="text-gray-500">{ title }<span className="ml-1 font-light">v{ version }</span></span>
+      <div className="bg-gray-900 border-b border-gray-800 flex justify-between appBar items-center pl-1 sticky top-0 left-0 right-0">
+        <span className="text-gray-500" onClick={ctxMenu}>{ title }</span>
         <div className="flex">
           {
-            update == 'downloaded' && <span className="updateAvailable cursor-pointer px-2" onClick={restart}>
+            update === 'downloaded' && <span className="updateAvailable cursor-pointer px-2" onClick={restart}>
               <FontAwesomeIcon icon={faSyncAlt} />
             </span>
           }
@@ -71,8 +75,6 @@ function App() {
           </span>
         </div>
       </div>
-      <div><button onClick={asEnable}>Enable autostart</button></div>
-      <div><button onClick={asDisable}>Disable autostart</button></div>
     </>
   );
 }

@@ -6,14 +6,20 @@ const AutoLaunch = require('auto-launch');
 const { autoUpdater } = require('electron-updater');
 const Store = require('./store.js');
 
-const gotTheLock = app.requestSingleInstanceLock();
+let gotTheLock
+if(!process.env.ELECTRON_START_URL) {
+  gotTheLock = app.requestSingleInstanceLock();
+} else {
+  gotTheLock = true;
+}
 
 const store = new Store({
   configName: 'user-preferences',
   defaults: {
     windowBounds: { width: 1280, height: 720 },
     windowMaximized: false,
-    autoStart: true
+    autoStart: true,
+    minimizeToTray: true
   }
 });
 
@@ -35,7 +41,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
-    }
+    },
+    show: false
   });
 
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -57,6 +64,7 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdates();
+    mainWindow.show();
   });
 
   let windowMaximized = store.get('windowMaximized');
@@ -161,7 +169,13 @@ const listeners = () => {
 
 ipcMain.on('window', (e, arg) => {
   if(arg == 'close') {
-    mainWindow.hide();
+    let minimizeToTray = store.get('minimizeToTray');
+    if(minimizeToTray) {
+      mainWindow.hide();
+    } else {
+      mainWindow.close();
+      mainWindow = null;
+    }
   }
 
   if(arg == 'maximize') {
@@ -202,6 +216,70 @@ ipcMain.on('app', (e, arg) => {
     store.set('autoStart', true);
   }
 })
+
+ipcMain.on('menu', (e, arg) => {
+  if(arg == 'appBar') {
+    let autoStart = store.get('autoStart');
+    let minimizeToTray = store.get('minimizeToTray');
+
+    const appBarMenuTemplate = [
+      {
+        label: pjson.productName,
+        sublabel: 'v' + pjson.version,
+        enabled: false,
+        icon: path.join(__dirname, '/../build/trayMenu.png')
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Auto Start',
+        type: 'submenu',
+        submenu: [
+          {
+            label: 'Enabled',
+            type: 'radio',
+            checked: autoStart,
+            click: () => { autoLaunch.enable(); store.set('autoStart', true); }
+          },
+          {
+            label: 'Disabled',
+            type: 'radio',
+            checked: !autoStart,
+            click: () => { autoLaunch.disable(); store.set('autoStart', false); }
+          }
+        ]
+      },
+      {
+        label: 'Minimize to tray',
+        type: 'submenu',
+        submenu: [
+          {
+            label: 'Enabled',
+            type: 'radio',
+            checked: minimizeToTray,
+            click: () => { store.set('minimizeToTray', true) }
+          },
+          {
+            label: 'Disabled',
+            type: 'radio',
+            checked: !minimizeToTray,
+            click: () => { store.set('minimizeToTray', false) }
+          }
+        ]
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit App',
+        click: () => app.quit()
+      }
+    ];
+    const appBarMenu = Menu.buildFromTemplate(appBarMenuTemplate);
+    appBarMenu.popup();
+  }
+});
 
 autoUpdater.on('update-available', () => {
   mainWindow.webContents.send('update', 'available');
