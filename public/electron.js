@@ -49,7 +49,7 @@ app.on('ready', () => {
   createWindow();
 
   tray = new Tray(path.join(__dirname, '/../build/icon.png'));
-  tray.setToolTip(pjson.build.productName);
+  tray.setToolTip(pjson.productName);
   tray.on('click', () => {
     mainWindow.show();
     autoUpdater.checkForUpdates();
@@ -57,7 +57,7 @@ app.on('ready', () => {
 
   const trayMenuTemplate = [
     {
-      label: pjson.build.productName,
+      label: pjson.productName,
       sublabel: 'v' + pjson.version,
       enabled: false,
       icon: path.join(__dirname, '/../build/trayMenu.png')
@@ -82,7 +82,7 @@ app.on('ready', () => {
 
   if(!process.env.ELECTRON_START_URL) {
     let autoLaunch = new AutoLaunch({
-      name: pjson.build.productName,
+      name: pjson.productName,
       path: app.getPath('exe'),
     });
     autoLaunch.isEnabled().then((isEnabled) => {
@@ -135,7 +135,7 @@ ipcMain.on('window', (e, arg) => {
 
 ipcMain.on('app', (e, arg) => {
   if(arg == 'title') {
-    e.returnValue = pjson.build.productName;
+    e.returnValue = pjson.productName;
   }
 
   if(arg == 'version') {
