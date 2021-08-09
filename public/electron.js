@@ -41,7 +41,7 @@ function createWindow() {
   listeners();
 
   mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdates();
   });
 }
 
@@ -52,6 +52,7 @@ app.on('ready', () => {
   tray.setToolTip(pjson.name);
   tray.on('click', () => {
     mainWindow.show();
+    autoUpdater.checkForUpdates();
   });
 
   const trayMenuTemplate = [
@@ -66,7 +67,7 @@ app.on('ready', () => {
     },
     {
       label: 'Open App',
-      click: () => mainWindow.show()
+      click: () => {mainWindow.show(); autoUpdater.checkForUpdates();}
     },
     {
       type: 'separator'
