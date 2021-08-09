@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, shell } = require('electron');
 const path = require('path');
 const url = require('url');
 const pjson = require('../package.json');
@@ -192,7 +192,7 @@ ipcMain.on('window', (e, arg) => {
   if(arg == 'minimize') {
     mainWindow.minimize();
   }
-})
+});
 
 ipcMain.on('app', (e, arg) => {
   if(arg == 'title') {
@@ -216,7 +216,7 @@ ipcMain.on('app', (e, arg) => {
     autoLaunch.enable();
     store.set('autoStart', true);
   }
-})
+});
 
 ipcMain.on('menu', (e, arg) => {
   if(arg == 'appBar') {
@@ -280,6 +280,10 @@ ipcMain.on('menu', (e, arg) => {
     const appBarMenu = Menu.buildFromTemplate(appBarMenuTemplate);
     appBarMenu.popup();
   }
+});
+
+ipcMain.on('link', (e, arg) => {
+  shell.openExternal(arg);
 });
 
 autoUpdater.on('update-available', () => {
