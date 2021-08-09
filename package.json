@@ -33,7 +33,7 @@
     "react": "BROWSER=none craco start",
     "react:win": "set BROWSER=none && craco start",
     "dist": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish onTag",
+    "deploy": "electron-builder build --win --publish always",
     "pack": "electron-builder --dir"
   },
   "eslintConfig": {
